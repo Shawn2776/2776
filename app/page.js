@@ -18,7 +18,6 @@ function SiteNav() {
     <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-black/50 border-b border-white/10">
       <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
         <a href="#" className="group inline-flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-white text-black grid place-items-center font-black">2776</div>
           <span className="font-semibold tracking-[0.18em] text-sm uppercase text-white/90 group-hover:text-white transition">
             2776
           </span>
@@ -140,8 +139,7 @@ function SiteFooter() {
     <footer className="border-t border-white/10">
       <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-3 text-white/70">
-          <div className="h-8 w-8 rounded-lg bg-white text-black grid place-items-center font-black">27</div>
-          <span className="text-sm">© {new Date().getFullYear()} 2776</span>
+          <span className="text-sm">© {new Date().getFullYear()} 2776, LLC</span>
         </div>
         <div className="text-sm text-white/60">
           Coeur d&apos;Alene, Idaho •{" "}
