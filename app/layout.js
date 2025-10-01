@@ -22,7 +22,7 @@ export const metadata = {
     description: "Fast, elegant websites that elevate your brand.",
     url: "https://2776.ltd",
     siteName: "2776",
-    images: [{ url: "https://2776.ltd/og.png", width: 1200, height: 630 }],
+    images: [{ url: "https://2776.ltd/og.jpg", width: 1200, height: 630 }],
     type: "website",
   },
   twitter: {
@@ -34,20 +34,25 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const isProd = process.env.NODE_ENV === "production";
+
   return (
     <html lang="en">
       <head>
-        {/* Google Analytics */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-15SE0FB4B7" strategy="afterInteractive" />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', 'G-15SE0FB4B7');
-          `}
-        </Script>
+        {isProd && (
+          <>
+            {/* Google Analytics */}
+            <Script src="https://www.googletagmanager.com/gtag/js?id=G-15SE0FB4B7" strategy="afterInteractive" />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-15SE0FB4B7');
+              `}
+            </Script>
+          </>
+        )}
       </head>
       <body className="min-h-screen bg-black text-white selection:bg-white/90 selection:text-black">
         <SiteNav />
