@@ -1,103 +1,152 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <main className="min-h-screen bg-black text-white selection:bg-white/90 selection:text-black">
+      <SiteNav />
+      <Hero />
+      <Contact />
+      <SiteFooter />
+    </main>
+  );
+}
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
+function SiteNav() {
+  return (
+    <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-black/50 border-b border-white/10">
+      <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
+        <a href="#" className="group inline-flex items-center gap-3">
+          <div className="h-8 w-8 rounded-lg bg-white text-black grid place-items-center font-black">27</div>
+          <span className="font-semibold tracking-[0.18em] text-sm uppercase text-white/90 group-hover:text-white transition">
+            2776
+          </span>
+        </a>
+        <nav className="hidden md:flex items-center gap-8 text-sm text-white/70">
+          <a href="#contact" className="hover:text-white/95 transition">
+            Contact
           </a>
           <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#contact"
+            className="ml-2 rounded-xl bg-white text-black px-4 py-2 font-medium hover:opacity-90 transition"
           >
-            Read our docs
+            Start a Project
+          </a>
+        </nav>
+      </div>
+    </header>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -top-40 left-1/2 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,#6366f1,transparent)] opacity-30 blur-3xl" />
+      </div>
+      <div className="mx-auto max-w-6xl px-6 py-24 md:py-36 text-center">
+        <h1 className="mt-6 text-5xl md:text-6xl font-extrabold tracking-tight">
+          Sleek. Premium. <span className="text-indigo-400">Web Experiences.</span>
+        </h1>
+        <p className="mx-auto mt-6 max-w-2xl text-lg text-white/70">
+          2776 crafts fast, elegant websites that elevate your brand and deliver results.
+        </p>
+        <div className="mt-10 flex items-center justify-center gap-4">
+          <a
+            href="#contact"
+            className="rounded-2xl bg-white text-black px-6 py-3 font-semibold hover:opacity-90 transition"
+          >
+            Start a Project
           </a>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+      </div>
+    </section>
+  );
+}
+
+function Contact() {
+  const [sent, setSent] = useState(false);
+
+  async function onSubmit(e) {
+    e.preventDefault();
+    const form = Object.fromEntries(new FormData(e.currentTarget).entries());
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+    if (res.ok) setSent(true);
+    else alert("Something went wrong. Try again.");
+  }
+
+  return (
+    <section id="contact" className="mx-auto max-w-3xl px-6 py-24">
+      <div className="text-center">
+        <h2 className="text-3xl md:text-4xl font-bold">Contact</h2>
+        <p className="mt-4 text-white/70">Let’s connect and talk about your project.</p>
+      </div>
+      <form onSubmit={onSubmit} className="mt-10 space-y-5">
+        <Field label="Name">
+          <input
+            required
+            name="name"
+            className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 outline-none focus:border-white/25"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+        </Field>
+        <Field label="Email">
+          <input
+            required
+            type="email"
+            name="email"
+            className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 outline-none focus:border-white/25"
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
+        </Field>
+        <Field label="Message">
+          <textarea
+            required
+            name="message"
+            rows={5}
+            className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 outline-none focus:border-white/25"
           />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        </Field>
+        <div className="flex items-center justify-end">
+          <button
+            className="rounded-2xl bg-white text-black px-6 py-3 font-semibold hover:opacity-90 transition"
+            disabled={sent}
+          >
+            {sent ? "Sent ✓" : "Send Message"}
+          </button>
+        </div>
+      </form>
+    </section>
+  );
+}
+
+function Field({ label, children }) {
+  return (
+    <label className="block">
+      <div className="mb-2 text-sm text-white/70">{label}</div>
+      {children}
+    </label>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="border-t border-white/10">
+      <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex items-center gap-3 text-white/70">
+          <div className="h-8 w-8 rounded-lg bg-white text-black grid place-items-center font-black">27</div>
+          <span className="text-sm">© {new Date().getFullYear()} 2776</span>
+        </div>
+        <div className="text-sm text-white/60">
+          Coeur d'Alene, Idaho •{" "}
+          <a href="mailto:shawn@2776.ltd" className="underline underline-offset-4 hover:text-white">
+            shawn@2776.ltd
+          </a>
+        </div>
+      </div>
+    </footer>
   );
 }
