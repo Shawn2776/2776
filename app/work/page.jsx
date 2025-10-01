@@ -33,21 +33,22 @@ export default function WorkPage() {
         {/* Placeholder */}
         <CaseStudy
           title="Your Project Here"
-          img="/screenshots/placeholder.jpg"
+          img="/your_project.png"
           link="#contact"
-          description="Looking to elevate your brand with a modern, custom website? Let’s build something sleek, premium, and effective together."
+          description="Looking to elevate your brand with a modern, custom website? Let's build something sleek, premium, and effective together."
           bullets={[
             "Web design tailored to your brand",
             "Fast, responsive, SEO-friendly builds",
             "Ongoing support and optimization",
           ]}
+          cta="Get Started →" // 👈 custom CTA text here
         />
       </div>
     </main>
   );
 }
 
-function CaseStudy({ title, img, link, description, bullets }) {
+function CaseStudy({ title, img, link, description, bullets, cta }) {
   return (
     <div className="grid md:grid-cols-2 gap-10 items-start">
       <div>
@@ -67,7 +68,7 @@ function CaseStudy({ title, img, link, description, bullets }) {
           rel="noopener noreferrer"
           className="mt-5 inline-block rounded-xl border border-white/20 px-4 py-2 text-sm hover:border-white/40"
         >
-          View Live Site →
+          {cta || "View Live Site →"} {/* fallback if cta not passed */}
         </a>
       </div>
     </div>
