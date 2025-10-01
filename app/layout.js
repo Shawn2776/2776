@@ -12,8 +12,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Sleek. Premium. Web Experiences | 2776",
-  description: "2776 crafts fast, elegant websites that elevate your brand, boost SEO, and deliver results.",
+  title: "2776",
+  description: "2776 crafts sleek, premium web experiences that elevate your brand and deliver results.",
   openGraph: {
     title: "2776 | Sleek. Premium. Web Experiences",
     description: "2776 crafts fast, elegant websites that elevate your brand, boost SEO, and deliver results.",
