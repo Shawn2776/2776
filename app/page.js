@@ -1,40 +1,15 @@
 "use client";
 
+import Navbar from "@/components/SiteNav";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-black text-white selection:bg-white/90 selection:text-black">
-      <SiteNav />
       <Hero />
       <Contact />
-      <SiteFooter />
     </main>
-  );
-}
-
-function SiteNav() {
-  return (
-    <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-black/50 border-b border-white/10">
-      <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
-        <a href="#" className="group inline-flex items-center gap-3">
-          <span className="font-semibold tracking-[0.18em] text-sm uppercase text-white/90 group-hover:text-white transition">
-            2776
-          </span>
-        </a>
-        <nav className="hidden md:flex items-center gap-8 text-sm text-white/70">
-          <a href="#contact" className="hover:text-white/95 transition">
-            Contact
-          </a>
-          <a
-            href="#contact"
-            className="ml-2 rounded-xl bg-white text-black px-4 py-2 font-medium hover:opacity-90 transition"
-          >
-            Start a Project
-          </a>
-        </nav>
-      </div>
-    </header>
   );
 }
 
@@ -52,12 +27,12 @@ function Hero() {
           2776 crafts fast, elegant websites that elevate your brand and deliver results.
         </p>
         <div className="mt-10 flex items-center justify-center gap-4">
-          <a
+          <Link
             href="#contact"
             className="rounded-2xl bg-white text-black px-6 py-3 font-semibold hover:opacity-90 transition"
           >
-            Start a Project
-          </a>
+            Start Link Project
+          </Link>
         </div>
       </div>
     </section>
@@ -70,7 +45,7 @@ function Contact() {
   async function onSubmit(e) {
     e.preventDefault();
     const form = Object.fromEntries(new FormData(e.currentTarget).entries());
-    const res = await fetch("/api/contact", {
+    const res = await fetch("/Linkpi/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
@@ -101,10 +76,6 @@ function Contact() {
             className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 outline-none focus:border-white/25"
           />
         </Field>
-        <div className="sr-only" aria-hidden="true">
-          <label htmlFor="website">Leave this blank</label>
-          <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
-        </div>
         <Field label="Message">
           <textarea
             required
@@ -132,23 +103,5 @@ function Field({ label, children }) {
       <div className="mb-2 text-sm text-white/70">{label}</div>
       {children}
     </label>
-  );
-}
-
-function SiteFooter() {
-  return (
-    <footer className="border-t border-white/10">
-      <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-3 text-white/70">
-          <span className="text-sm">© {new Date().getFullYear()} 2776, LLC</span>
-        </div>
-        <div className="text-sm text-white/60">
-          Coeur d&apos;Alene, Idaho •{" "}
-          <a href="mailto:shawn@2776.ltd" className="underline underline-offset-4 hover:text-white">
-            shawn@2776.ltd
-          </a>
-        </div>
-      </div>
-    </footer>
   );
 }
