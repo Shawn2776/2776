@@ -1,6 +1,7 @@
 "use client";
 
 import Navbar from "@/components/SiteNav";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -16,10 +17,15 @@ export default function Home() {
 function Hero() {
   return (
     <section className="relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -top-40 left-1/2 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,#6366f1,transparent)] opacity-30 blur-3xl" />
+      {/* Background image */}
+      <div className="absolute inset-0 z-0">
+        <div className="relative h-full w-full">
+          <Image src="/hero-grid.png" alt="" fill priority className="object-cover opacity-70" />
+        </div>
       </div>
-      <div className="mx-auto max-w-6xl px-6 py-24 md:py-36 text-center">
+
+      {/* Content */}
+      <div className="relative z-10 mx-auto max-w-6xl px-6 py-24 md:py-36 text-center">
         <h1 className="mt-6 text-5xl md:text-6xl font-extrabold tracking-tight">
           Sleek. Premium. <span className="text-indigo-400">Web Experiences.</span>
         </h1>
@@ -31,7 +37,7 @@ function Hero() {
             href="#contact"
             className="rounded-2xl bg-white text-black px-6 py-3 font-semibold hover:opacity-90 transition"
           >
-            Start Link Project
+            Start a Project
           </Link>
         </div>
       </div>
