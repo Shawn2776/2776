@@ -22,7 +22,7 @@ export const metadata = {
     description: "Fast, elegant websites that elevate your brand.",
     url: "https://2776.ltd",
     siteName: "2776",
-    images: [{ url: "https://2776.ltd/og.jpg", width: 1200, height: 630 }],
+    images: [{ url: "https://2776.ltd/og.png", width: 1200, height: 630 }],
     type: "website",
   },
   twitter: {
