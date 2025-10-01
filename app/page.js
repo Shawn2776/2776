@@ -141,7 +141,7 @@ function SiteFooter() {
           <span className="text-sm">© {new Date().getFullYear()} 2776</span>
         </div>
         <div className="text-sm text-white/60">
-          Coeur d'Alene, Idaho •{" "}
+          Coeur d&apos;Alene, Idaho •{" "}
           <a href="mailto:shawn@2776.ltd" className="underline underline-offset-4 hover:text-white">
             shawn@2776.ltd
           </a>
