@@ -101,9 +101,10 @@ function Contact() {
             className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 outline-none focus:border-white/25"
           />
         </Field>
-        <Field label="Leave this blank" className="hidden">
-          <input type="text" name="website" tabIndex={-1} autoComplete="off" />
-        </Field>
+        <div className="sr-only" aria-hidden="true">
+          <label htmlFor="website">Leave this blank</label>
+          <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+        </div>
         <Field label="Message">
           <textarea
             required
