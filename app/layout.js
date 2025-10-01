@@ -18,19 +18,18 @@ export const metadata = {
   title: "2776",
   description: "2776 crafts sleek, premium web experiences that elevate your brand and deliver results.",
   openGraph: {
-    title: "2776 | Sleek. Premium. Web Experiences",
-    description: "2776 crafts fast, elegant websites that elevate your brand, boost SEO, and deliver results.",
+    title: "2776 — Sleek. Premium. Web Experiences.",
+    description: "Fast, elegant websites that elevate your brand.",
     url: "https://2776.ltd",
     siteName: "2776",
-    images: [{ url: "/logo.png", width: 800, height: 600 }],
-    locale: "en_US",
+    images: [{ url: "https://2776.ltd/og.jpg", width: 1200, height: 630 }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "2776 | Sleek. Premium. Web Experiences",
-    description: "Fast, elegant websites that elevate your brand and deliver results.",
-    images: ["/logo.png"],
+    title: "2776 — Sleek. Premium. Web Experiences.",
+    description: "Fast, elegant websites that elevate your brand.",
+    images: ["https://2776.ltd/og.png"],
   },
 };
 
