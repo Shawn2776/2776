@@ -27,7 +27,7 @@ function Hero() {
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-6xl px-6 py-24 md:py-36 text-center">
         <h1 className="mt-6 text-5xl md:text-6xl font-extrabold tracking-tight">
-          Sleek. Premium. <span className="text-indigo-400">Web Experiences.</span>
+          Sleek. Premium. <span className="text-[#d45e2b]">Web Experiences.</span>
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg text-white/70">
           2776 crafts fast, elegant websites that elevate your brand and deliver results.

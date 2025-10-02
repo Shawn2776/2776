@@ -4,7 +4,9 @@ export default function SiteFooter() {
     <footer className="border-t border-white/10">
       <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-3 text-white/70">
-          <span className="text-sm">© {new Date().getFullYear()} 2776</span>
+          <span className="text-sm">
+            © {new Date().getFullYear()} <span className="text-[#d45e2b]">2776</span>
+          </span>
         </div>
         <div className="text-sm text-white/60">
           Coeur d&apos;Alene, Idaho •{" "}

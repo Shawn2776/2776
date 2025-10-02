@@ -1,4 +1,5 @@
 // components/SiteNav.jsx
+import Image from "next/image";
 import Link from "next/link";
 
 export default function SiteNav() {
@@ -7,7 +8,14 @@ export default function SiteNav() {
       <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
         <Link href="/" className="group inline-flex items-center gap-3">
           <span className="font-semibold tracking-[0.18em] text-sm uppercase text-white/90 group-hover:text-white transition">
-            2776
+            <Image
+              src="/2776_logo_orange.png"
+              alt="2776"
+              width={600} // intrinsic file size (any correct ratio works)
+              height={160}
+              className="h-6 w-auto md:h-7 lg:h-8" // auto width, responsive height
+              priority // keep LCP snappy
+            />
           </span>
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm text-white/70">
