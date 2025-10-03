@@ -51,7 +51,7 @@ function Contact() {
   async function onSubmit(e) {
     e.preventDefault();
     const form = Object.fromEntries(new FormData(e.currentTarget).entries());
-    const res = await fetch("/Linkpi/contact", {
+    const res = await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
