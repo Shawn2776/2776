@@ -23,10 +23,6 @@ export async function POST(req) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    if (reqBody.website) {
-      return NextResponse.json({ error: "Spam detected" }, { status: 400 });
-    }
-
     const transporter = getTransporter();
 
     await transporter.sendMail({
