@@ -64,7 +64,7 @@ function Contact() {
     <section id="contact" className="mx-auto max-w-3xl px-6 py-24">
       <div className="text-center">
         <h2 className="text-3xl md:text-4xl font-bold">Contact</h2>
-        <p className="mt-4 text-white/70">Let’s connect and talk about your project.</p>
+        <p className="mt-4 text-white/70">Let&apos;s connect and talk about your project.</p>
       </div>
       <form onSubmit={onSubmit} className="mt-10 space-y-5">
         <Field label="Name">
