@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
-// simple per-IP rate limiter (1-minute window)
+// ---- simple per-IP rate limiter (1m window) ----
 const WINDOW_MS = 60_000;
 const MAX_HITS = 5;
 global._contactRate = global._contactRate || new Map();
@@ -18,10 +18,12 @@ function rateLimit(ip) {
 }
 
 function getTransporter() {
+  const port = Number(process.env.SMTP_PORT || 465);
+  const secure = port === 465; // 465=SSL, 587=STARTTLS
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST, // e.g. smtp.fastmail.com
-    port: Number(process.env.SMTP_PORT || 465), // 465 SSL, 587 STARTTLS
-    secure: process.env.SMTP_PORT === "465",
+    host: process.env.SMTP_HOST, // e.g., smtp.fastmail.com
+    port,
+    secure,
     auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
   });
 }
@@ -37,16 +39,22 @@ const DISPOSABLE = new Set([
 export async function POST(req) {
   try {
     const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0] || "unknown";
-    const form = await req.formData();
+    const ua = req.headers.get("user-agent") || "";
 
+    // --- parse FormData (NOT JSON) ---
+    const form = await req.formData();
     const name = (form.get("name") || "").toString().trim();
     const email = (form.get("email") || "").toString().trim();
     const message = (form.get("message") || "").toString().trim();
-    const hp = (form.get("hp_field") || "").toString().trim();
-    const renderedAt = Number(form.get("ts_rendered_at") || 0);
-    const token = (form.get("cf-turnstile-response") || "").toString();
 
+    // hidden bot controls
+    const hp = (form.get("hp_field") || "").toString().trim(); // honeypot
+    const renderedAt = Number((form.get("ts_rendered_at") || 0).toString()); // min time
+    const token = (form.get("cf-turnstile-response") || "").toString(); // Turnstile
+
+    // --- guards ---
     if (hp) return NextResponse.json({ error: "Bad Request", reason: "honeypot" }, { status: 400 });
+
     if (!renderedAt || Date.now() - renderedAt < 4000)
       return NextResponse.json({ error: "Bad Request", reason: "too_fast" }, { status: 400 });
 
@@ -57,27 +65,18 @@ export async function POST(req) {
       return NextResponse.json({ error: "Bad Request", reason: "bad_email" }, { status: 400 });
 
     const domain = email.split("@")[1]?.toLowerCase() || "";
-    const DISPOSABLE = new Set([
-      "mailinator.com",
-      "tempmail.dev",
-      "sharklasers.com",
-      "10minutemail.com",
-      "guerrillamail.com",
-    ]);
     if (DISPOSABLE.has(domain))
       return NextResponse.json({ error: "Bad Request", reason: "disposable_email" }, { status: 400 });
 
     const tooShort = message.length < 20;
     const noSpaces = !/\s/.test(message);
-    const looksGibberish = /^[A-Za-z0-9+/=]{15,}$/.test(message);
+    const looksGibberish = /^[A-Za-z0-9+/=]{15,}$/.test(message); // base64-ish junk
     if (tooShort || noSpaces || looksGibberish)
       return NextResponse.json({ error: "Bad Request", reason: "low_quality" }, { status: 400 });
 
     if (!token) return NextResponse.json({ error: "Bad Request", reason: "missing_turnstile_token" }, { status: 400 });
 
-    // … then your Turnstile verify + email send (unchanged) …
-
-    // Turnstile verify
+    // --- Turnstile verify ---
     const verify = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
       method: "POST",
       headers: { "content-type": "application/x-www-form-urlencoded" },
@@ -88,13 +87,18 @@ export async function POST(req) {
       }),
     }).then((r) => r.json());
 
-    if (!verify?.success) return NextResponse.json({ error: "Captcha failed" }, { status: 400 });
+    if (!verify?.success)
+      return NextResponse.json({ error: "Bad Request", reason: "captcha_failed", details: verify }, { status: 400 });
 
-    // rate limit
-    if (!rateLimit(ip)) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    // --- rate limit ---
+    if (!rateLimit(ip))
+      return NextResponse.json({ error: "Too Many Requests", reason: "rate_limited" }, { status: 429 });
 
-    // send mail
+    // --- send email ---
     const transporter = getTransporter();
+    // verify transport (better error messages during setup)
+    await transporter.verify();
+
     await transporter.sendMail({
       from: process.env.SMTP_FROM || process.env.SMTP_USER,
       to: process.env.SMTP_TO || process.env.SMTP_USER,
@@ -114,11 +118,20 @@ export async function POST(req) {
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("Email send error:", err);
-    return NextResponse.json({ error: "Email failed to send" }, { status: 500 });
+    console.error("Email send error:", {
+      code: err?.code,
+      command: err?.command,
+      response: err?.response,
+      message: err?.message,
+    });
+    return NextResponse.json(
+      { error: "Email failed", code: err?.code || "UNKNOWN", reason: err?.message || "Unknown error" },
+      { status: 500 }
+    );
   }
 }
 
+// tiny HTML escape
 function escapeHtml(str) {
   return String(str)
     .replaceAll("&", "&amp;")
