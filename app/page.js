@@ -1,9 +1,9 @@
 "use client";
 
-import Navbar from "@/components/SiteNav";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import Script from "next/script";
+import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
   return (
@@ -47,26 +47,45 @@ function Hero() {
 
 function Contact() {
   const [sent, setSent] = useState(false);
+  const formRef = useRef(null);
+
+  // set "rendered at" timestamp for min-time check
+  useEffect(() => {
+    const el = formRef.current?.querySelector('[name="ts_rendered_at"]');
+    if (el) el.value = String(Date.now());
+  }, []);
 
   async function onSubmit(e) {
     e.preventDefault();
-    const form = Object.fromEntries(new FormData(e.currentTarget).entries());
-    const res = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    const fd = new FormData(formRef.current);
+    const res = await fetch("/api/contact", { method: "POST", body: fd });
     if (res.ok) setSent(true);
     else alert("Something went wrong. Try again.");
   }
 
   return (
     <section id="contact" className="mx-auto max-w-3xl px-6 py-24">
+      {/* Turnstile script */}
+      <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+
       <div className="text-center">
         <h2 className="text-3xl md:text-4xl font-bold">Contact</h2>
         <p className="mt-4 text-white/70">Let&apos;s connect and talk about your project.</p>
       </div>
-      <form onSubmit={onSubmit} className="mt-10 space-y-5">
+
+      <form ref={formRef} onSubmit={onSubmit} className="mt-10 space-y-5">
+        {/* Honeypot (hidden) */}
+        <input
+          type="text"
+          name="hp_field"
+          autoComplete="off"
+          tabIndex={-1}
+          aria-hidden="true"
+          style={{ position: "absolute", left: "-9999px" }}
+        />
+        {/* Min time */}
+        <input type="hidden" name="ts_rendered_at" value="" />
+
         <Field label="Name">
           <input
             required
@@ -90,6 +109,10 @@ function Contact() {
             className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 outline-none focus:border-white/25"
           />
         </Field>
+
+        {/* Cloudflare Turnstile widget */}
+        <div className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}></div>
+
         <div className="flex items-center justify-end">
           <button
             className="rounded-2xl bg-white text-black px-6 py-3 font-semibold hover:opacity-90 transition"
