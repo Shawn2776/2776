@@ -37,38 +37,45 @@ const DISPOSABLE = new Set([
 export async function POST(req) {
   try {
     const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0] || "unknown";
-    const ua = req.headers.get("user-agent") || "";
-
-    // parse FormData (NOT JSON)
     const form = await req.formData();
+
     const name = (form.get("name") || "").toString().trim();
     const email = (form.get("email") || "").toString().trim();
     const message = (form.get("message") || "").toString().trim();
-
-    // hidden controls
     const hp = (form.get("hp_field") || "").toString().trim();
     const renderedAt = Number(form.get("ts_rendered_at") || 0);
     const token = (form.get("cf-turnstile-response") || "").toString();
 
-    // honeypot
-    if (hp) return NextResponse.json({ error: "Bot" }, { status: 400 });
+    if (hp) return NextResponse.json({ error: "Bad Request", reason: "honeypot" }, { status: 400 });
+    if (!renderedAt || Date.now() - renderedAt < 4000)
+      return NextResponse.json({ error: "Bad Request", reason: "too_fast" }, { status: 400 });
 
-    // min fill time (>= 4s)
-    if (!renderedAt || Date.now() - renderedAt < 4000) return NextResponse.json({ error: "Too fast" }, { status: 400 });
+    if (!name || !email || !message)
+      return NextResponse.json({ error: "Bad Request", reason: "missing_fields" }, { status: 400 });
 
-    // required + email sanity
-    if (!name || !email || !message) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return NextResponse.json({ error: "Bad email" }, { status: 400 });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return NextResponse.json({ error: "Bad Request", reason: "bad_email" }, { status: 400 });
 
     const domain = email.split("@")[1]?.toLowerCase() || "";
-    if (DISPOSABLE.has(domain)) return NextResponse.json({ error: "Disposable blocked" }, { status: 400 });
+    const DISPOSABLE = new Set([
+      "mailinator.com",
+      "tempmail.dev",
+      "sharklasers.com",
+      "10minutemail.com",
+      "guerrillamail.com",
+    ]);
+    if (DISPOSABLE.has(domain))
+      return NextResponse.json({ error: "Bad Request", reason: "disposable_email" }, { status: 400 });
 
-    // cheap junk detection
     const tooShort = message.length < 20;
     const noSpaces = !/\s/.test(message);
     const looksGibberish = /^[A-Za-z0-9+/=]{15,}$/.test(message);
-    if (tooShort || noSpaces || looksGibberish) return NextResponse.json({ error: "Low quality" }, { status: 400 });
+    if (tooShort || noSpaces || looksGibberish)
+      return NextResponse.json({ error: "Bad Request", reason: "low_quality" }, { status: 400 });
+
+    if (!token) return NextResponse.json({ error: "Bad Request", reason: "missing_turnstile_token" }, { status: 400 });
+
+    // … then your Turnstile verify + email send (unchanged) …
 
     // Turnstile verify
     const verify = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {

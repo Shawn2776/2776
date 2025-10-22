@@ -58,9 +58,13 @@ function Contact() {
   async function onSubmit(e) {
     e.preventDefault();
     const fd = new FormData(formRef.current);
-    const res = await fetch("/api/contact", { method: "POST", body: fd });
-    if (res.ok) setSent(true);
-    else alert("Something went wrong. Try again.");
+    const res = await fetch("/api/contact", { method: "POST", body: new FormData(formRef.current) });
+    if (res.ok) {
+      setSent(true);
+      return;
+    }
+    const data = await res.json().catch(() => ({}));
+    alert(`Blocked: ${data.reason || res.status}`);
   }
 
   return (
