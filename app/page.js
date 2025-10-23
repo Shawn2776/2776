@@ -47,38 +47,79 @@ function Hero() {
 
 function Contact() {
   const [sent, setSent] = useState(false);
+  const [err, setErr] = useState("");
   const formRef = useRef(null);
+  const widgetIdRef = useRef(null); // Turnstile widget id
 
-  // set "rendered at" timestamp for min-time check
+  // stamp render time for min-time check
   useEffect(() => {
     const el = formRef.current?.querySelector('[name="ts_rendered_at"]');
     if (el) el.value = String(Date.now());
   }, []);
 
+  // Render Turnstile as *invisible* once the script loads
+  function onTurnstileLoad() {
+    try {
+      if (widgetIdRef.current) return;
+      // Render into the container; invisible = no visible UI
+      widgetIdRef.current = window.turnstile.render("#turnstile-container", {
+        sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+        size: "invisible",
+        callback: async () => {
+          // Token is now present as hidden input; submit the form
+          const fd = new FormData(formRef.current);
+          const res = await fetch("/api/contact", { method: "POST", body: fd });
+          if (res.ok) {
+            setSent(true);
+            setErr("");
+          } else {
+            const data = await res.json().catch(() => ({}));
+            setErr(data.reason || "Submit failed");
+          }
+          // Reset the widget so it can be executed again if needed
+          window.turnstile.reset(widgetIdRef.current);
+        },
+      });
+    } catch (e) {
+      setErr("Captcha init failed");
+    }
+  }
+
   async function onSubmit(e) {
     e.preventDefault();
-    const fd = new FormData(formRef.current);
-    const res = await fetch("/api/contact", { method: "POST", body: new FormData(formRef.current) });
-    if (res.ok) {
-      setSent(true);
+
+    // Basic client-side quality check (mirrors server rule)
+    const msg = formRef.current?.querySelector('[name="message"]')?.value || "";
+    if (msg.trim().length < 20) {
+      setErr("Message must be at least 20 characters.");
       return;
     }
-    const data = await res.json().catch(() => ({}));
-    alert(`Blocked: ${data.reason || res.status}`);
+    setErr("");
+
+    // Execute invisible Turnstile; callback above will run form submit
+    if (window.turnstile && widgetIdRef.current) {
+      window.turnstile.execute(widgetIdRef.current);
+    } else {
+      setErr("Captcha not ready. Reload and try again.");
+    }
   }
 
   return (
     <section id="contact" className="mx-auto max-w-3xl px-6 py-24">
-      {/* Turnstile script */}
-      <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+      {/* Load Turnstile script; render invisibly on load */}
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        strategy="afterInteractive"
+        onLoad={onTurnstileLoad}
+      />
 
       <div className="text-center">
         <h2 className="text-3xl md:text-4xl font-bold">Contact</h2>
         <p className="mt-4 text-white/70">Let&apos;s connect and talk about your project.</p>
       </div>
 
-      <form ref={formRef} onSubmit={onSubmit} className="mt-10 space-y-5">
-        {/* Honeypot (hidden) */}
+      <form ref={formRef} onSubmit={onSubmit} className="mt-10 space-y-5" noValidate>
+        {/* Honeypot + min-time */}
         <input
           type="text"
           name="hp_field"
@@ -87,8 +128,9 @@ function Contact() {
           aria-hidden="true"
           style={{ position: "absolute", left: "-9999px" }}
         />
-        {/* Min time */}
         <input type="hidden" name="ts_rendered_at" value="" />
+        {/* Invisible widget mount point (no visible badge) */}
+        <div id="turnstile-container" />
 
         <Field label="Name">
           <input
@@ -110,12 +152,11 @@ function Contact() {
             required
             name="message"
             rows={5}
+            minLength={20}
             className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 outline-none focus:border-white/25"
           />
+          {err && <p className="mt-2 text-sm text-red-400">{err}</p>}
         </Field>
-
-        {/* Cloudflare Turnstile widget */}
-        <div className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}></div>
 
         <div className="flex items-center justify-end">
           <button
