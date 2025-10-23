@@ -128,8 +128,7 @@ function Contact() {
           aria-hidden="true"
           style={{ position: "absolute", left: "-9999px" }}
         />
-        <input type="hidden" name="ts_rendered_at" value="" />
-        {/* Invisible widget mount point (no visible badge) */}
+
         <div id="turnstile-container" />
 
         <Field label="Name">

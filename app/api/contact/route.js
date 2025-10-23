@@ -55,9 +55,6 @@ export async function POST(req) {
     // --- guards ---
     if (hp) return NextResponse.json({ error: "Bad Request", reason: "honeypot" }, { status: 400 });
 
-    if (!renderedAt || Date.now() - renderedAt < 2000)
-      return NextResponse.json({ error: "Bad Request", reason: "too_fast" }, { status: 400 });
-
     if (!name || !email || !message)
       return NextResponse.json({ error: "Bad Request", reason: "missing_fields" }, { status: 400 });
 
